@@ -75,6 +75,11 @@ python3 scroll_evaluator.py --split validation --dataset_name {dataset_name} --p
 python3 hotpot_evaluator.py --pred_path {prediction_fild}
 ```
 
+## TODOs
+
+- [x] Release finetuning and inference code.
+- [ ] Release pre-trained LoRA weights on HuggingFace.
+- [ ] Integrate to [VLLM](https://github.com/vllm-project/vllm).
 
 ## Citation
 If you find LLoCO useful or relevant to your project and research, please kindly cite our paper:
