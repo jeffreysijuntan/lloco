@@ -1,0 +1,14 @@
+python3 inference.py  \
+        --model_name_or_path meta-llama/Llama-2-7b-chat-hf \
+        --dataset_name qmsum \
+        --eval_mode autocomp \
+        --out_path ./eval/qmsum_lloco.json \
+        --peft_model output/lloco_qmsum  \
+        --embedding_path ./embeddings/qmsum_val_embs.pth \
+        --output_dir output/eval_scrolls  \
+        --fp16 True \
+        --tf32 True \
+        --lora_r 8 \
+        --lora_alpha 16 \
+        --emb_model_name "autocomp" \
+        --max_new_tokens 96 \
