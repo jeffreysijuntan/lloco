@@ -46,7 +46,7 @@ torchrun --nproc_per_node=4 finetune_quality.py  \
 ```
 
 ### Inference & Evaluation
-Below is an bash script to run inference over the validation sets are contained in `script/inference.sh`. Evaluation results are stored in `out_path`, and the finetuned model is specified by `peft_model`. 
+Below is a bash script to run inference over the validation sets are contained in `script/inference.sh`. Evaluation results are stored in `out_path`, and the finetuned model is specified by `peft_model`. 
 ```bash
 python3 inference.py  \
     --model_name_or_path meta-llama/Llama-2-7b-chat-hf \
