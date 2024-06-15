@@ -1,11 +1,11 @@
-torchrun --nproc_per_node=4 finetune_hotpot.py  \
+torchrun --nproc_per_node=4 --master_port 20640 finetune_hotpot.py \
         --output_dir output/lloco_hotpot \
         --run_name lloco-hotpot \
         --embedding_path ./embeddings/hqa_train_embs.pth \
-        --num_train_epochs 6  \
+        --num_train_epochs 3  \
         --per_device_train_batch_size 1     \
         --per_device_eval_batch_size 1     \
-        --gradient_accumulation_steps 2     \
+        --gradient_accumulation_steps 4     \
         --evaluation_strategy "no"     \
         --save_strategy "steps"     \
         --save_steps 10000     \
@@ -24,3 +24,4 @@ torchrun --nproc_per_node=4 finetune_hotpot.py  \
         --emb_model_name "autocomp" \
         --report_to "wandb" \
         --eval_mode "autocomp" \
+        --n_sample 20000     \

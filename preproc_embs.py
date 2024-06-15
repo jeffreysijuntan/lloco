@@ -1,5 +1,4 @@
-import random
-
+import os, random
 import fire
 import numpy as np
 import torch
@@ -109,6 +108,7 @@ def preprocess_quality(preprocessor, quality_path, out_path):
         emb = preprocessor.preprocess_single(context)
         cache[pid] = emb
 
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
     torch.save(cache, out_path)
 
 
@@ -133,6 +133,7 @@ def preprocess_qasper(preprocessor, split="train", out_path=None):
         emb = preprocessor.preprocess_single(context)
         cache[pid] = emb
 
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
     torch.save(cache, out_path)
 
 
@@ -159,14 +160,15 @@ def preprocess_scrolls(preprocessor, dataset_name, split="train", out_path=None)
         emb = preprocessor.preprocess_single(context)
         cache[pid] = emb
 
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
     torch.save(cache, out_path)
 
 
-def preprocess_hotpotqa(preprocessor, split="train", out_path=None):
+def preprocess_hotpotqa(preprocessor, split="train", out_path=None, n_sample=20000):
     dataset = load_dataset("hotpot_qa", "fullwiki", split=split)
     if split == "train":
-        print("Shuffling and selecting 10k examples from the training set...")
-        dataset = dataset.shuffle(seed=42).select(range(10000))
+        print(f"Shuffling and selecting {n_sample} examples from the training set...")
+        dataset = dataset.shuffle(seed=42).select(range(n_sample))
     cache = {}
     for entry in tqdm(dataset):
         pid = entry["id"]
@@ -183,6 +185,7 @@ def preprocess_hotpotqa(preprocessor, split="train", out_path=None):
         emb = preprocessor.preprocess_single(context)
         cache[pid] = emb
 
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
     torch.save(cache, out_path)
 
 
@@ -196,6 +199,7 @@ def preprocess_needle(preprocessor, tokenizer, needle, context_length, out_path,
             emb = preprocessor.preprocess_single(tokenizer.decode(content))
             key = f"{ctx_len}_{depth_percent}"
             cache[key] = emb
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
     torch.save(cache, out_path)
 
 
@@ -216,17 +220,19 @@ def preprocess_needle_magic_city(preprocessor, tokenizer, context_length, out_pa
                 cache[key] = emb
                 cache[f"{key}_needle"] = rnd_needle
 
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
     torch.save(cache, out_path)
 
 
 def main(
         emb_model_name, dataset, split="train", truncation=True, data_path=None, 
-        out_path=None, model_name_or_path="meta-llama/Llama-2-7b-chat-hf", context_length=32000):
+        out_path=None, n_sample=20000, 
+        model_name_or_path="meta-llama/Llama-2-7b-chat-hf", context_length=32000):
     preprocessor = EmbeddingPreprocessor(emb_model_name, truncation=truncation)
     if dataset == "quality":
         preprocess_quality(preprocessor, data_path, out_path)
-    elif dataset == "hotpotqa":
-        preprocess_hotpotqa(preprocessor, split=split, out_path=out_path)
+    elif dataset == "hotpot_qa":
+        preprocess_hotpotqa(preprocessor, split=split, out_path=out_path, n_sample=n_sample)
     elif dataset in ["qasper", "narrative_qa", "qmsum"]:
         preprocess_scrolls(preprocessor, dataset, split=split, out_path=out_path)
     elif dataset == "needle":
@@ -244,6 +250,8 @@ def main(
         lines = input.splitlines()
         context = "\n".join(lines[1:])
         preprocess_needle_magic_city(preprocessor, tokenizer, context_length, out_path=out_path, context=context)
+    else:
+        raise NotImplementedError("Dataset not supported.")
 
 
 if __name__ == "__main__":
